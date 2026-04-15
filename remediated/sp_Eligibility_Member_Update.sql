@@ -1,0 +1,29 @@
+USE [QNXT_ELIGPROC_UNV]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[sp_Eligibility_Member_Update]
+AS
+BEGIN
+  SET FMTONLY OFF
+  SET NOCOUNT ON
+
+  UPDATE M
+  SET 
+    M.SECONDARYID = substring(ag.description, 1, 2)
+  FROM DC10QXTUNT01.QNXT_PLANDATA_UNV.dbo.MEMBER M
+  INNER JOIN DC10QXTUNT01.QNXT_PLANDATA_UNV.dbo.ENROLLKEYS EK
+    ON M.MEMID = EK.MEMID
+    AND GETDATE() BETWEEN EK.EFFDATE AND EK.TERMDATE
+  INNER JOIN DC10QXTUNT01.QNXT_PLANDATA_UNV.dbo.accessgroup ag
+    ON ag.accessgroupid = 'VA0006'
+  WHERE M.SECONDARYID = ''
+    AND M.CREATEID NOT LIKE '%MEG_20_%'
+    AND M.MEMID <> ''
+
+  -- M.ethnicid has been removed due to the column being dropped in PlanData.Member
+  END
